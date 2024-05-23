@@ -1,4 +1,4 @@
-from rest_framework import status
+from rest_framework import status, mixins, generics,viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -89,4 +89,50 @@ class TodoDetailView(APIView):
         todo.delete()
         return Response(None, status=status.HTTP_204_NO_CONTENT)
 
+
 # endregion
+
+# region mixins
+class TodoListMixinsView(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
+    queryset = Todo.objects.all()
+    serializer_class = TodoSerializer
+
+    def get(self, request: Request):
+        return self.list(request)
+
+    def post(self, request: Request):
+        return self.create(request)
+
+
+class TodoDetailMixinsView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.DestroyModelMixin,
+                           generics.GenericAPIView):
+    queryset = Todo.objects.all()
+    serializer_class = TodoSerializer
+
+    def get(self, request: Request, pk):
+        return self.retrieve(request, pk)
+
+    def put(self, request: Request, pk):
+        return self.update(request, pk)
+
+    def delete(self, request: Request, pk):
+        return self.delete(request, pk)
+# endregion
+
+#region generic
+class TodoGenericAPIView(generics.ListCreateAPIView):
+    queryset = Todo.objects.all()
+    serializer_class = TodoSerializer
+
+class TodoGenericDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Todo.objects.all()
+    serializer_class = TodoSerializer
+
+#endregion
+
+
+#region viewset
+class TodoViewSetAPIView(viewsets.ModelViewSet):
+    queryset = Todo.objects.all()
+    serializer_class = TodoSerializer
+#endregion
