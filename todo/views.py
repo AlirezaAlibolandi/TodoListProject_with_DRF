@@ -1,12 +1,17 @@
-from rest_framework import status, mixins, generics,viewsets
+from rest_framework import status, mixins, generics, viewsets
+from rest_framework.authentication import BasicAuthentication
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 
-from .serializers import TodoSerializer
+from .serializers import TodoSerializer,UserSerializer
 from todo.models import Todo
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 # Create your views here.
 
@@ -117,22 +122,35 @@ class TodoDetailMixinsView(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, m
 
     def delete(self, request: Request, pk):
         return self.delete(request, pk)
+
+
 # endregion
 
-#region generic
+# region generic
 class TodoGenericAPIView(generics.ListCreateAPIView):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
+    pagination_class = PageNumberPagination
 
 class TodoGenericDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
+    page_size = 2
+    authentication_classes = [BasicAuthentication]
+    permission_classes = [IsAuthenticated]
 
-#endregion
 
+# endregion
 
-#region viewset
+# region viewset
 class TodoViewSetAPIView(viewsets.ModelViewSet):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
+# endregion
+
+
+#region nested serializer (user)
+class UserGenereationAPIView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
 #endregion

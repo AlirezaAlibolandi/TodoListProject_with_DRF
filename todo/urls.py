@@ -12,6 +12,7 @@ urlpatterns = [
     path('mixins/<pk>', views.TodoDetailMixinsView.as_view()),
     path('generics/', views.TodoGenericAPIView.as_view()),
     path('generics/<pk>', views.TodoGenericDetailAPIView.as_view()),
+    path('nested', views.UserGenereationAPIView.as_view()),
     path('viewsets/', include(router.urls)),
 
 ]
